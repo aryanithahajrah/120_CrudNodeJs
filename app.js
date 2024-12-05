@@ -10,6 +10,24 @@ const session = require('express-session');
 const authRoutes = require('./routes/authRoutes');
 const {isAuthenticated} = require('./middlewares/middleware.js');
 
+const path = require('path');
+
+// Setup session middleware
+app.use(session({
+    secret: 'your-secret-key', 
+    resave: false,
+    saveUninitialized: true,
+}));
+
+// Middleware untuk melayani file statis
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Middleware untuk menambahkan `user` ke res.locals
+app.use((req, res, next) => {
+    // Pastikan `user` ada dalam session, jika tidak, beri nilai null
+    res.locals.user = req.session.userId || null;  // userId disimpan di session saat login
+    next();
+});
 
 app.use(expressLayout);
 app.use(express.json());

@@ -3,6 +3,31 @@ const bcrypt = require('bcryptjs');
 const db = require('../database/db');
 const router = express.Router();
 
+const session = require('express-session');
+const app = express();
+
+// Middleware untuk parsing body request
+app.use(express.urlencoded({ extended: true }));
+
+// Setup session middleware
+app.use(session({
+    secret: 'your-secret-key',  // Gantilah dengan kunci yang lebih aman
+    resave: false,
+    saveUninitialized: true,
+}));
+
+// Middleware untuk menambahkan `user` ke res.locals
+app.use((req, res, next) => {
+    res.locals.user = req.session.userId; // Mengambil userId dari session
+    next();
+});
+
+app.use((req, res, next) => {
+    res.locals.page = ''; // Defaultkan page ke string kosong
+    next();
+});
+
+
 // Route Signup
 router.post('/signup', (req, res) => {
     const { username, password } = req.body;
